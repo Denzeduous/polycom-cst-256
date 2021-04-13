@@ -440,7 +440,7 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "INSERT INTO GroupMember (group_id, user_id) VALUES (?, ?)";
+    		$query = "INSERT INTO groupmember (group_id, user_id) VALUES (?, ?)";
     		$stmt = $conn->prepare($query);
     		$stmt->bind_param('ii', $group_id, $user_id);
     		
@@ -541,7 +541,7 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "SELECT group_id, owner_id, group_name FROM groupmember JOIN affinitygroup USING (group_id) WHERE user_id=? OR owner_id=?";
+    		$query = "SELECT group_id, owner_id, group_name FROM uqilklzbjzdrtjdt.groupmember LEFT JOIN uqilklzbjzdrtjdt.affinitygroup USING (group_id) UNION SELECT group_id, owner_id, group_name FROM uqilklzbjzdrtjdt.groupmember RIGHT JOIN uqilklzbjzdrtjdt.affinitygroup USING (group_id) WHERE user_id=? OR owner_id=?";
     		$stmt = $conn->prepare($query);
 
     		$stmt->bind_param('ii', $user_id, $user_id);
@@ -969,12 +969,13 @@ class userDAO {
     		$query = "UPDATE user SET bio=?, contact=?, skills=?, education=? WHERE user_id=?";
     		$stmt = $conn->prepare($query);
     		$stmt->bind_param('ssssi', $bio, $contact, $skills, $education, $user_id);
-    		
+    		Log::info ('Got here in update!');
     		$success = $stmt->execute();
     		
     		$stmt->close();
 
     		DBConnector::CloseConnection($conn);
+
     		return $success;
     	}
     	

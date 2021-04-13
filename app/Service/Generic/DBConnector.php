@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// DBConnector v0.1
+// Creates and destroyed connections to the database.
+
 namespace App\Service\Generic;
 
 class DBConnector {

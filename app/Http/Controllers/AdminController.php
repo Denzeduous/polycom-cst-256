@@ -1,4 +1,7 @@
 <?php
+// Polycom v0.1
+// Admin Controller v0.1
+// Holds admin functionality and authorization.
 
 namespace App\Http\Controllers;
 

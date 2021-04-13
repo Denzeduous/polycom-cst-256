@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// Mail Controller v0
+// Will hold functionality for mail (WIP).
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;

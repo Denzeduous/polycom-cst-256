@@ -1,7 +1,12 @@
 <?php
 
+// Polycom v0.1
+// Group Controller v0.1
+// Holds functionality for viewing, editing, creating, and deleting groups.
+
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -9,6 +14,8 @@ use App\Service\UserDAO;
 
 class GroupController extends Controller {
 	public function GetGroup (Request $request, string $group_name) {
+		$group_name = urldecode($group_name);
+		
 		$group = UserDAO::GetGroupByName($group_name);
 		
 		if ($group === null) return view('message', ['message_type' => '404', 'message_content' => 'Group "' . $group_name . '" does not exist.', 'previous_url' => url ()->previous ()]);
@@ -40,11 +47,13 @@ class GroupController extends Controller {
 		$name = $request->get('name');
 
 		UserDAO::CreateUserGroup(session ()->get ('user')->GetUserID(), $name);
-		
-		return $this->GetGroup($request, $name);
+
+		return redirect ('/group/' . urlencode($name));
 	}
 
 	public function DeleteGroup (Request $request, string $group_name) {
+		$group_name = urldecode($group_name);
+
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
 		
 		$group = UserDAO::GetGroupByName($group_name);
@@ -59,6 +68,8 @@ class GroupController extends Controller {
 	}
 
 	public function JoinGroup (Request $request, string $group_name) {
+		$group_name = urldecode($group_name);
+
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
 		
 		$group = UserDAO::GetGroupByName($group_name);
@@ -70,10 +81,12 @@ class GroupController extends Controller {
 
 		UserDAO::AddUserToGroup($group->GetID(), $user->GetUserID());
 		
-		return redirect ('/group/' . $group_name);
+		return redirect ('/group/' . urlencode($group_name));
 	}
 
 	public function LeaveGroup (Request $request, string $group_name) {
+		$group_name = urldecode($group_name);
+
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
 
 		$group = UserDAO::GetGroupByName($group_name);
@@ -85,10 +98,12 @@ class GroupController extends Controller {
 
 		UserDAO::RemoveUserFromGroup($group->GetID(), $user->GetUserID());
 
-		return redirect ('/group/' . $group_name);
+		return redirect ('/group/' . urlencode ($group_name));
 	}
 
 	public function GroupMembers (Request $request, string $group_name) {
+		$group_name = urldecode($group_name);
+
 		$group = UserDAO::GetGroupByName($group_name);
 
 		if ($group === null) return view('message', ['message_type' => '404', 'message_content' => 'Group "' . $group_name . '" does not exist and cannot be joined.', 'previous_url' => url ()->previous ()]);
@@ -119,6 +134,6 @@ class GroupController extends Controller {
 				$validator->errors ()->add ('name', 'Group already exists.');
 		});
 
-			return $validator;
+		return $validator;
 	}
 }

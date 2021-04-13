@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// Group User Model v0.1
+// Is a group member.
+
 namespace App\Model;
 
 use DateTime;

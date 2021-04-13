@@ -1,7 +1,12 @@
 <?php
 
+// Polycom v0.1
+// Login Controller v0.1
+// Holds functionality for registering, logging in, and logging out.
+
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +26,7 @@ class LoginController extends Controller {
 		if ($user === null) return view('message', ['message_type' => 'Internal Server Error (500)', 'message_content' => 'An unknown error occurred during validation. User was not found on the database.', 'previous_url' => url ()->previous ()]);
 
 		// Put a header-formatted user object into the session.
-		$request->session ()->put ('user', $user);
+		session ()->put ('user', $user);
 		
 		return redirect ('/');
 	}
@@ -52,7 +57,7 @@ class LoginController extends Controller {
 		if (!$success) return view ('error');
 		
 		// Put a header-formatted user object into the session.
-		$request->session ()->put ('user', $user);
+		session ()->put ('user', UserDAO::FromUsername($username));
 		
 		return redirect ('/');
 	}

@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// Profile Controller v0.1
+// Holds functionality for viewing and editing profiles.
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -40,12 +44,19 @@ class ProfileController extends Controller {
 	public function EditProfile (Request $request) {
 		Log::info('Entering ' . __METHOD__);
 
-		$user = Session::get('user');
+		$user = session('user', null);
+		
+		if ($user === null) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to edit a profile.', 'previous_url' => url ()->previous ()]);
 
-		$user->SetBio       ($request->input ('bio'      ));
-		$user->SetContact   ($request->input ('contact'  ));
-		$user->SetSkills    ($request->input ('skills'   ));
-		$user->SetEducation ($request->input ('education'));
+		$bio       = $request->input ('bio'      );
+		$contact   = $request->input ('contact'  );
+		$skills    = $request->input ('skills'   );
+		$education = $request->input ('education');
+		
+		$user->SetBio       ($bio       !== null ? $bio       : '');
+		$user->SetContact   ($contact   !== null ? $contact   : '');
+		$user->SetSkills    ($skills    !== null ? $skills    : '');
+		$user->SetEducation ($education !== null ? $education : '');
 		
 		UserDAO::UpdateUserProfile($user);
 		
@@ -69,9 +80,6 @@ class ProfileController extends Controller {
 		
 		else
 			$company = $request->input ('company');
-
-		if ($start_date !== null)
-			$start_date = DateTime::createFromFormat('Y-m-d', $start_date);
 
 		$start_date = ($start_date !== null) ? DateTime::createFromFormat('Y-m-d', $start_date) : new DateTime ("@$epoch"); // Magic number is epoch
 		$end_date   = ($end_date   !== null) ? DateTime::createFromFormat('Y-m-d', $end_date)   : new DateTime ("@$epoch"); // Magic number is epoch

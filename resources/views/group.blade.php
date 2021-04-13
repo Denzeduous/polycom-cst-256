@@ -6,11 +6,11 @@
 
 @if(Session::has('user'))
 	@if($group->GetOwner()->GetUserID() === Session::get('user')->GetUserID())
-		<a href="/group/delete/{{ $group->GetName() }}"><span id="group-delete"  class="btn btn-outline-danger my-2 my-sm-0">Delete Group</span></a>
+		<a href="/group/delete/{{ urlencode($group->GetName()) }}"><span id="group-delete"  class="btn btn-outline-danger my-2 my-sm-0">Delete Group</span></a>
 	@elseif($is_member)
-		<a href="/group/leave/{{ $group->GetName() }}"><span id="group-leave"  class="btn btn-outline-danger my-2 my-sm-0">Leave Group</span></a>
+		<a href="/group/leave/{{ urlencode($group->GetName()) }}"><span id="group-leave"  class="btn btn-outline-danger my-2 my-sm-0">Leave Group</span></a>
 	@else
-		<a href="/group/join/{{ $group->GetName() }}"><span id="group-join"  class="btn btn-outline-success my-2 my-sm-0">Join Group</span></a>
+		<a href="/group/join/{{ urlencode($group->GetName()) }}"><span id="group-join"  class="btn btn-outline-success my-2 my-sm-0">Join Group</span></a>
 	@endif
 @endif
 
@@ -29,7 +29,7 @@
 			@endforeach
 			
 			@if($extra_member_count != 0)
-				<p color="bg-grey">... and <a href="/group/{{ $group->GetName() }}/members">{{ $extra_member_count }} more</a>.</p>
+				<p color="bg-grey">... and <a href="/group/{{ urlencode($group->GetName()) }}/members">{{ $extra_member_count }} more</a>.</p>
 			@endif
 		</div>
 	</div>

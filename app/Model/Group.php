@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// Group Model v0.1
+// Is a group.
+
 namespace App\Model;
 
 class Group {

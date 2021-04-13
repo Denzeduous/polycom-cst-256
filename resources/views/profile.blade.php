@@ -130,17 +130,13 @@
 			<!-- Posts -->
 			<div class="col-5">
 				<h3>Groups</h3>
-				<?php Illuminate\Support\Facades\Log::info ("Got here!"); ?>
-				<?php Illuminate\Support\Facades\Log::info ("count: " . count($groups)); ?>
 				@if(count($groups) > 0)
 					@foreach($groups as $group)
-						<?php Illuminate\Support\Facades\Log::info ("Got here in foreach!"); ?>
 						<p style="text-align: center" width="100%">
-							<a href="/group/{{ $group->GetName() }}">{{ $group->GetName() }}</a>
+							<a href="/group/{{ urlencode($group->GetName()) }}">{{ $group->GetName() }}</a>
 						</p>
 					@endforeach
 				@else
-				<?php Illuminate\Support\Facades\Log::info ("Got here instead!"); ?>
 					{{ $user->GetFirstName() }} is not a member of any groups.
 				@endif
 				<div>

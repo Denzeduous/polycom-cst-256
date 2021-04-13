@@ -1,5 +1,9 @@
 <?php
 
+// Polycom v0.1
+// User Model v0.1
+// Is a user. Has several methods to make construction easier, as it has a lot of parameters.
+
 namespace App\Model;
 
 use DateTime;

@@ -1,0 +1,37 @@
+.login-body {
+	height: 100vh;
+	background-image: url('/resources/svg/login-background.svg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	vertical-align: middle;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+}
+
+.login-form {
+	position: absolute;
+	height: 60vh;
+	width: 60vw;
+	top: 20vw;
+	left: 19vh;
+	background-color: white;
+	border: 1px solid black;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.login-form-container {
+	height: auto;
+	top: 50%;
+	left: 50%;
+	transform: translate(0, 50%);
+	vertical-align: middle;
+}
+
+.login-error {
+	color: red;
+	font-weight: bold;
+}

@@ -1,0 +1,45 @@
+p {
+	text-align: left;
+}
+
+textarea {
+	width: 100%;
+	display: none;
+}
+
+.empty {
+	color: grey;
+	font-style: italic;
+}
+
+.profile-username {
+	text-align: center;
+	color: grey;
+}
+
+.profile-email {
+	text-align: center;
+}
+
+.profile-edit, .profile-edit:hover {
+	color: white;
+	background-color: #49E805;
+	border-radius: 5px;
+	padding: 5px 10px 5px 10px;
+	font-style: none;
+	text-decoration: none;
+}
+
+.profile-editable {
+	text-align: left;
+}
+
+#profile-popup-background {
+	background-color: rgba(0, 0, 0, 0.5);
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	width: 100vw;
+	height: 100vh;
+	display: none;
+}

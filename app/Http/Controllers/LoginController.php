@@ -10,6 +10,7 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Service\MailService;
 use App\Service\SuspensionDAO;
 use App\Service\UserDAO;
 use App\Model\User;
@@ -48,16 +49,20 @@ class LoginController extends Controller {
 		$is_business = $request->input ('isbusiness') === 'on';
 
 		$firstname = $firstname !== null ? $firstname : '';
-		
+
 		$user = User::ForNewUser($firstname, $lastname, $username, $email, $is_business);
-		
+
 		$success = UserDAO::CreateUser ($user, $password);
 		
 		// Early exit, this means something went wrong.
 		if (!$success) return view ('error');
 		
+		$user = UserDAO::FromUsername($username);
+		
+		MailService::SendVerification($user->GetUserID());
+		
 		// Put a header-formatted user object into the session.
-		session ()->put ('user', UserDAO::FromUsername($username));
+		session ()->put ('user', $user);
 		
 		return redirect ('/');
 	}

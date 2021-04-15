@@ -12,7 +12,7 @@ use DateTime;
 use App\Model\Group;
 use App\Model\GroupUser;
 
-class userDAO {
+class UserDAO {
 
     /**
      * Gets all users in an array. This is meant for listing.
@@ -31,7 +31,7 @@ class userDAO {
             $query = "SELECT username, first_name, last_name, email, is_admin, is_business FROM user";
             $result = $conn->query($query);
 
-            $User = array();
+            $user = array();
 
             while ($row = $result->fetch_assoc()) {
             	$first_name  = $row['first_name' ];
@@ -41,14 +41,14 @@ class userDAO {
                 $is_admin    = $row['is_admin'   ];
                 $is_business = $row['is_business'];
 
-                $User[] = user::ForListing ($username, $first_name, $last_name, $email, $is_admin, $is_business);
+                $user[] = User::ForListing ($username, $first_name, $last_name, $email, $is_admin, $is_business);
             }
 
             mysqli_free_result($result);
 
             DBConnector::CloseConnection($conn);
 
-            return $User;
+            return $user;
         }
         
         catch (Exception $e) {
@@ -73,7 +73,7 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "INSERT INTO Suspension (user_id, end_date) VALUES ((SELECT user_id FROM user WHERE username=?), date_add(now(),interval ? day))";
+    		$query = "INSERT INTO suspension (user_id, end_date) VALUES ((SELECT user_id FROM user WHERE username=?), date_add(now(),interval ? day))";
     		$stmt = $conn->prepare($query);
 
     		$stmt->bind_param('si', $username, $end_date);
@@ -107,24 +107,31 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "SELECT username, first_name, last_name, email, is_admin, is_business FROM user WHERE username LIKE %?%";
+    		$query = "SELECT username, first_name, last_name, is_admin, is_business FROM user WHERE first_name LIKE CONCAT('%',?,'%') OR last_name LIKE CONCAT('%',?,'%') OR username LIKE CONCAT('%',?,'%') OR bio LIKE CONCAT('%',?,'%') OR contact LIKE CONCAT('%',?,'%') OR skills LIKE CONCAT('%',?,'%') OR education LIKE CONCAT('%',?,'%')";
     		$stmt = $conn->prepare($query);
-    		$stmt->bind_param('s', $username);
+    		$stmt->bind_param('sssssss', $username, $username, $username, $username, $username, $username, $username);
     		
     		$stmt->execute();
     		$result = $stmt->get_result();
     		
-    		$User = array();
+    		$users = array();
     		
     		while ($row = $result->fetch_assoc()) {
     			$first_name  = $row['first_name' ];
     			$last_name   = $row['last_name'  ];
     			$username    = $row['username'   ];
-    			$email       = $row['email'      ];
     			$is_admin    = $row['is_admin'   ];
     			$is_business = $row['is_business'];
     			
-    			$User[] = user::ForListing ($username, $first_name, $last_name, $email, $is_admin, $is_business);
+    			$user = User::ForListing ($first_name, $last_name, $username, $is_admin, $is_business);
+    			
+    			Log::info('first_name: ' . $user->GetFirstName());
+    			Log::info('last_name: ' . $user->GetLastName());
+    			Log::info('username: ' . $user->GetUsername());
+    			Log::info('is_admin: ' . ($user->IsAdmin() ? 'true' : 'false'));
+    			Log::info('is_business: ' . ($user->IsBusiness() ? 'true' : 'false'));
+    			
+    			$users[] = $user;
     		}
     		
     		mysqli_free_result($result);
@@ -132,12 +139,109 @@ class userDAO {
     		$stmt->close();
     		DBConnector::CloseConnection($conn);
     		
-    		return $User;
+    		return $users;
     	}
     	
     	catch (Exception $e) {
     		Log::error ($e->getMessage());
     		return null;
+    	}
+    }
+    
+    /**
+     * Gets all jobs from a query.
+     * @param string $query The query to search for.
+     * @return array An array of jobs found.
+     */
+    public static function SearchJobs (string $job): array {
+    	$conn = DBConnector::GetConnection();
+    	
+    	if ($conn->connect_error) {
+    		Log::error ("Connection failed: " . $conn->connect_error);
+    		return array();
+    	}
+    	
+    	try {
+    		$query = "SELECT experience_id, title, last_name AS company_name FROM jobexperience NATURAL JOIN user WHERE user.is_business AND (title LIKE CONCAT('%',?,'%') OR responsibilities LIKE CONCAT('%',?,'%') OR projects LIKE CONCAT('%',?,'%'))";
+    		$stmt = $conn->prepare($query);
+    		$stmt->bind_param('sss', $job, $job, $job);
+    		
+    		Log::info('query: ' . $job);
+    		
+    		$stmt->execute();
+    		$result = $stmt->get_result();
+    		
+    		$jobs = array();
+    		
+    		while ($row = $result->fetch_assoc()) {
+    			$experience_id = $row['experience_id'];
+    			$title         = $row['title'        ];
+    			$company       = $row['company_name' ];
+    			
+    			Log::info('experience_id: ' . $experience_id);
+    			Log::info('title: ' . $title);
+    			Log::info('company: ' . $company);
+    			
+    			$jobs[] = new JobExperience($experience_id, $title, $company, new DateTime(), new Datetime(), true, '', '');
+    		}
+    		
+    		mysqli_free_result($result);
+    		
+    		$stmt->close();
+    		DBConnector::CloseConnection($conn);
+    		
+    		return $jobs;
+    	}
+    	
+    	catch (Exception $e) {
+    		Log::error ($e->getMessage());
+    		return array();
+    	}
+    }
+    
+    /**
+     * Searches groups and returns an array of found groups.
+     * @param string $group_name The name to search for (can be a section of a name).
+     * @return array An array of groups.
+     */
+    public static function SearchGroups (string $group_name): array {
+    	$conn = DBConnector::GetConnection();
+    	
+    	if ($conn->connect_error) {
+    		Log::error ("Connection failed: " . $conn->connect_error);
+    		return array();
+    	}
+    	
+    	try {
+    		$query = "SELECT affinitygroup.group_id, affinitygroup.group_name, affinitygroup.owner_id, COUNT(groupmember.user_id) + 1 AS member_count FROM affinitygroup LEFT OUTER JOIN groupmember ON affinitygroup.group_id = groupmember.group_id WHERE affinitygroup.group_name LIKE CONCAT('%',?,'%') GROUP BY affinitygroup.group_id";
+    		$stmt = $conn->prepare($query);
+    		$stmt->bind_param('s', $group_name);
+    		
+    		$stmt->execute();
+    		$result = $stmt->get_result();
+    		
+    		$groups = array();
+    		
+    		while ($row = $result->fetch_assoc()) {
+    			$group_id     = $row['group_id'    ];
+    			$owner_id     = $row['owner_id'    ];
+    			$group_name   = $row['group_name'  ];
+    			$member_count = $row['member_count'];
+    			
+    			$groups[] = new Group($group_id, $group_name, UserDAO::FromID($owner_id), $member_count);
+    		}
+    		
+    		mysqli_free_result($result);
+    		
+    		$stmt->close();
+    		DBConnector::CloseConnection($conn);
+    		
+    		return $groups;
+    	}
+    	
+    	catch (Exception $e) {
+    		Log::error ($e->getMessage());
+    		return array();
     	}
     }
 
@@ -155,16 +259,16 @@ class userDAO {
         }
 
         try {
-            $query = "SELECT first_name, last_name, username, is_admin, is_business FROM user WHERE user_id=?";
+            $query = "SELECT first_name, last_name, username, email, is_admin, is_business FROM user WHERE user_id=?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param('i', $id);
 
             $stmt->execute();
             $stmt->store_result();
-            $stmt->bind_result($first_name, $last_name, $username, $is_admin, $is_business);
+            $stmt->bind_result($first_name, $last_name, $username, $email, $is_admin, $is_business);
             $stmt->fetch();
 
-            $user = user::ForHeader ($id, $first_name, $last_name, $username, $is_admin, $is_business);
+            $user = User::ForHeader ($id, $first_name, $last_name, $username, $email, $is_admin, $is_business);
 
             $stmt->close();
             DBConnector::CloseConnection($conn);
@@ -194,16 +298,16 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "SELECT user_id, first_name, last_name, is_admin, is_business FROM user WHERE username=?";
+    		$query = "SELECT user_id, first_name, last_name, email, is_admin, is_business FROM user WHERE username=?";
     		$stmt = $conn->prepare($query);
     		$stmt->bind_param('s', $username);
     		
     		$stmt->execute();
     		$stmt->store_result();
-    		$stmt->bind_result($user_id, $first_name, $last_name, $is_admin, $is_business);
+    		$stmt->bind_result($user_id, $first_name, $last_name, $email, $is_admin, $is_business);
     		$stmt->fetch();
     		
-    		$user = user::ForHeader ($user_id, $first_name, $last_name, $username, $is_admin, $is_business);
+    		$user = User::ForHeader ($user_id, $first_name, $last_name, $username, $email, $is_admin, $is_business);
 
     		$stmt->close();
     		DBConnector::CloseConnection($conn);
@@ -262,7 +366,7 @@ class userDAO {
 			$experience = array ();
 			
 			while ($stmt->fetch()) {
-				$job = new jobexperience(
+				$job = new JobExperience(
 					$id,
 					$title,
 					$company,
@@ -278,12 +382,63 @@ class userDAO {
 				array_push($experience, $job);
 			}
     		
-    		$user = user::ForProfile($user_id, $first_name, $last_name, $username, $email, $bio, $contact, $skills, $education, $experience, $date_joined, $is_admin, $is_business);
+    		$user = User::ForProfile($user_id, $first_name, $last_name, $username, $email, $bio, $contact, $skills, $education, $experience, $date_joined, $is_admin, $is_business);
     		
     		$stmt->close();
     		DBConnector::CloseConnection($conn);
     		
     		return $user;
+    	}
+    	
+    	catch (Exception $e) {
+    		Log::error ($e->getMessage());
+    		return null;
+    	}
+    }
+    
+    /**
+     * Gets job experience from ID.
+     * @param int $id The job's ID.
+     * @return JobExperience The job found.
+     */
+    public static function GetJobExperience (int $id) {
+    	$conn = DBConnector::GetConnection();
+    	
+    	if ($conn->connect_error) {
+    		Log::error ("Connection failed: " . $conn->connect_error);
+    		return null;
+    	}
+    	
+    	try {
+    		$query = "SELECT title, company, start_date, end_date, is_current, responsibilities, projects FROM jobexperience WHERE experience_id=?";
+    		$stmt  = $conn->prepare($query);
+    		$stmt->bind_param('i', $id);
+    		
+    		$stmt->execute();
+    		$stmt->store_result();
+    		$stmt->bind_result($title, $company, $start_date, $end_date, $is_current, $responsibilities, $projects);
+    		
+    		$job = null;
+    		
+    		if ($stmt->fetch()) {
+    			$job = new JobExperience(
+    					$id,
+    					$title,
+    					$company,
+    					DateTime::createFromFormat ('Y-m-d', $start_date),
+    					
+    					$end_date !== null ? DateTime::createFromFormat ('Y-m-d', $start_date) : new DateTime(),
+    					
+    					$is_current,
+    					$responsibilities,
+    					$projects,
+    			);
+    		}
+    		
+    		$stmt->close();
+    		DBConnector::CloseConnection($conn);
+    		
+    		return $job;
     	}
     	
     	catch (Exception $e) {
@@ -541,7 +696,7 @@ class userDAO {
     	}
     	
     	try {
-    		$query = "SELECT group_id, owner_id, group_name FROM uqilklzbjzdrtjdt.groupmember LEFT JOIN uqilklzbjzdrtjdt.affinitygroup USING (group_id) UNION SELECT group_id, owner_id, group_name FROM uqilklzbjzdrtjdt.groupmember RIGHT JOIN uqilklzbjzdrtjdt.affinitygroup USING (group_id) WHERE user_id=? OR owner_id=?";
+    		$query = "SELECT affinitygroup.group_id, affinitygroup.owner_id, affinitygroup.group_name FROM groupmember LEFT OUTER JOIN affinitygroup ON (affinitygroup.group_id) WHERE groupmember.user_id=? OR affinitygroup.owner_id=?";
     		$stmt = $conn->prepare($query);
 
     		$stmt->bind_param('ii', $user_id, $user_id);

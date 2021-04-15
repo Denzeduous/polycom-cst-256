@@ -16,7 +16,7 @@ class EmailVerification {
 		}
 		
 		try {
-			$query = "DELETE FROM EmailVerificationStorage WHERE user_id=?";
+			$query = "DELETE FROM emailverificationstorage WHERE user_id=?";
 			$stmt  = $conn->prepare($query);
 
 			$stmt->bind_param('i', $id);
@@ -25,7 +25,7 @@ class EmailVerification {
 
 			$password = bin2hex(random_bytes(25));
 
-			$query = "INSERT INTO EmailVerificationStorage (user_id, verification_password) VALUES (?, ?)";
+			$query = "INSERT INTO emailverificationstorage (user_id, verification_password) VALUES (?, ?)";
 			$stmt  = $conn->prepare($query);
 
 			$stmt->bind_param('is', $id, $password);
@@ -40,36 +40,6 @@ class EmailVerification {
 		catch (Exception $e) {
 			Log::error ($e->getMessage());
 			return null;
-		}
-	}
-	
-	public static function VerifyEmail (int $id, string $password) {
-		$conn = DBConnector::GetConnection();
-		
-		if ($conn->connect_error) {
-			Log::error ("Connection failed: " . $conn->connect_error);
-			return False;
-		}
-		
-		try {
-			$query = "SELECT COUNT(1), verification_password FROM User WHERE user_id=?";
-			$stmt = $conn->prepare($query);
-			$stmt->bind_param('i', $id);
-			
-			$stmt->execute();
-			$stmt->store_result();
-			$stmt->bind_result($verification_exists, $verification_password);
-			$stmt->fetch();
-			$stmt->close();
-
-			DBConnector::CloseConnection($conn);
-
-			return $verification_exists && $password === $verification_password;
-		}
-		
-		catch (Exception $e) {
-			Log::error ($e->getMessage());
-			return False;
 		}
 	}
 }

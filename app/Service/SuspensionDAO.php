@@ -45,6 +45,10 @@ class SuspensionDAO {
 			$stmt->bind_result($suspended, $end_date, $user_id);
 			$stmt->fetch();
 			$stmt->close();
+			
+			Log::info('suspended: ' . $suspended);
+			Log::info('end_date: ' . $end_date);
+			Log::info('user_id: ' . $user_id);
 
 			DBConnector::CloseConnection($conn);
 			

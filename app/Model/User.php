@@ -91,12 +91,12 @@ class User {
 	 * @param bool $is_business If the user is a business.
 	 * @return \App\Model\User The constructed User model.
 	 */
-	public static function ForHeader (int $user_id, string $first_name, string $last_name, string $username, bool $is_admin, bool $is_business) {
-		return new User ($user_id, $first_name, $last_name, $username, "", "", "", "", "", null, new DateTime(), $is_admin, $is_business);
+	public static function ForHeader (int $user_id, string $first_name, string $last_name, string $username, string $email, bool $is_admin, bool $is_business) {
+		return new User ($user_id, $first_name, $last_name, $username, $email, "", "", "", "", null, new DateTime(), $is_admin, $is_business);
 	}
 	
-	public static function ForListing (int $user_id, string $first_name, string $last_name, string $username, bool $is_admin, bool $is_business) {
-		return new User ($user_id, $first_name, $last_name, $username, "", "", "", "", "", null, new DateTime(), $is_admin, $is_business);
+	public static function ForListing (string $first_name, string $last_name, string $username, bool $is_admin, bool $is_business) {
+		return new User (0, $first_name, $last_name, $username, "", "", "", "", "", null, new DateTime(), $is_admin, $is_business);
 	}
 	
 	/**

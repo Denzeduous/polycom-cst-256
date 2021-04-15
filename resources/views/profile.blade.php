@@ -1,5 +1,5 @@
 @extends('layouts.mainlayout', ['title' => $user->GetFirstName() . ' ' . $user->GetLastName() . ' - Polycom', 'post_button' => true])
-<?php Illuminate\Support\Facades\Log::info ("Got here in the page!"); ?>
+
 @push('styles')
 	<link href="{{ asset('/resources/css/profile.css') }}" rel="stylesheet">
 @endpush

@@ -10,11 +10,13 @@ class Group {
 	private int $id;
 	private string $name;
 	private User $owner;
+	private int $member_count;
 	
-	public function __construct (int $id, string $name, User $owner) {
+	public function __construct (int $id, string $name, User $owner, int $member_count = 0) {
 		$this->id    = $id;
 		$this->name  = $name;
 		$this->owner = $owner;
+		$this->member_count = $member_count;
 	}
 	
 	public function GetID (): int {

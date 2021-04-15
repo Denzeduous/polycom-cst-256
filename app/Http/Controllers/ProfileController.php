@@ -120,5 +120,13 @@ class ProfileController extends Controller {
 		
 		return redirect ()->back ();
 	}
+	
+	public function GetJob (Request $request, int $id) {
+		$id = intval ($id);
+		
+		$job = UserDAO::GetJobExperience($id);
+		
+		return view('job')->with('job', $job);
+	}
 }
 

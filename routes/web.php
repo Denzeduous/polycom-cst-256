@@ -44,3 +44,11 @@ Route::get('/group/delete/{group}', 'GroupController@DeleteGroup');
 Route::get('/group/join/{group}', 'GroupController@JoinGroup');
 Route::get('/group/leave/{group}', 'GroupController@LeaveGroup');
 Route::get('/group/{group}/members', 'GroupController@GroupMembers');
+
+Route::get('/email-verify/{id}', 'MailController@VerifyEmail');
+
+Route::get('/search/user', 'SearchController@SearchUsers');
+Route::get('/search/group', 'SearchController@SearchGroups');
+Route::get('/search/job', 'SearchController@SearchJobs');
+
+Route::get('/job/{id}', 'ProfileController@GetJob');

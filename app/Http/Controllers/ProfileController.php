@@ -126,6 +126,8 @@ class ProfileController extends Controller {
 		
 		$job = UserDAO::GetJobExperience($id);
 		
+		if ($job === null) return response(404);
+		
 		return view('job')->with('job', $job);
 	}
 }

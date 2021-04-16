@@ -52,3 +52,7 @@ Route::get('/search/group', 'SearchController@SearchGroups');
 Route::get('/search/job', 'SearchController@SearchJobs');
 
 Route::get('/job/{id}', 'ProfileController@GetJob');
+
+Route::get('/rest/user/{username}', 'RestController@UserFromUsername');
+Route::get('/rest/jobs/{query}', 'RestController@GetJobs');
+Route::get('/rest/job/{id}', 'RestController@GetJob');

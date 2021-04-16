@@ -162,7 +162,7 @@ class UserDAO {
     	}
     	
     	try {
-    		$query = "SELECT experience_id, title, last_name AS company_name FROM jobexperience NATURAL JOIN user WHERE user.is_business AND (title LIKE CONCAT('%',?,'%') OR responsibilities LIKE CONCAT('%',?,'%') OR projects LIKE CONCAT('%',?,'%'))";
+    		$query = "SELECT experience_id, title, last_name AS company_name, responsibilities, projects FROM jobexperience NATURAL JOIN user WHERE user.is_business AND (title LIKE CONCAT('%',?,'%') OR responsibilities LIKE CONCAT('%',?,'%') OR projects LIKE CONCAT('%',?,'%')) LIMIT 20";
     		$stmt = $conn->prepare($query);
     		$stmt->bind_param('sss', $job, $job, $job);
     		
@@ -174,15 +174,17 @@ class UserDAO {
     		$jobs = array();
     		
     		while ($row = $result->fetch_assoc()) {
-    			$experience_id = $row['experience_id'];
-    			$title         = $row['title'        ];
-    			$company       = $row['company_name' ];
+    			$experience_id = $row['experience_id'   ];
+    			$title         = $row['title'           ];
+    			$company       = $row['company_name'    ];
+    			$respons       = $row['responsibilities'];
+    			$projects      = $row['projects'        ];
     			
     			Log::info('experience_id: ' . $experience_id);
     			Log::info('title: ' . $title);
     			Log::info('company: ' . $company);
     			
-    			$jobs[] = new JobExperience($experience_id, $title, $company, new DateTime(), new Datetime(), true, '', '');
+    			$jobs[] = new JobExperience($experience_id, $title, $company, new DateTime(), new Datetime(), true, $respons, $projects);
     		}
     		
     		mysqli_free_result($result);

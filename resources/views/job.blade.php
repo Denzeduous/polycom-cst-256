@@ -8,7 +8,7 @@
 	<div style="width: 30%; margin-left: 35%; text-align: left">
 	{!! \App\Service\MarkdownParser::parse($job->GetResponsibilities()) !!}
 	</div>
-	<h2>Projects</h2>
+	<h2>Requirements</h2>
 	<div style="width: 30%; margin-left: 35%; text-align: left">
 	{!! \App\Service\MarkdownParser::parse($job->GetProjects()) !!}
 	</div>

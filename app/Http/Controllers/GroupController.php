@@ -14,6 +14,8 @@ use App\Service\UserDAO;
 
 class GroupController extends Controller {
 	public function GetGroup (Request $request, string $group_name) {
+		
+		// Name will always be encoded.
 		$group_name = urldecode($group_name);
 		
 		$group = UserDAO::GetGroupByName($group_name);
@@ -23,6 +25,8 @@ class GroupController extends Controller {
 		$members = UserDAO::GetUsersForGroup($group->GetID());
 		
 		$member_slice = $members;
+		
+		// Limits shown members to 20
 		$extra_member_length = 0;
 		$is_member = false;
 		
@@ -52,6 +56,8 @@ class GroupController extends Controller {
 	}
 
 	public function DeleteGroup (Request $request, string $group_name) {
+		
+		// Name will always be encoded.
 		$group_name = urldecode($group_name);
 
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
@@ -68,6 +74,8 @@ class GroupController extends Controller {
 	}
 
 	public function JoinGroup (Request $request, string $group_name) {
+		
+		// Name will always be encoded.
 		$group_name = urldecode($group_name);
 
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
@@ -85,6 +93,8 @@ class GroupController extends Controller {
 	}
 
 	public function LeaveGroup (Request $request, string $group_name) {
+		
+		// Name will always be encoded.
 		$group_name = urldecode($group_name);
 
 		if (!session()->has('user')) return view('message', ['message_type' => '403', 'message_content' => 'You must be logged in to delete a group.', 'previous_url' => '/login']);
@@ -102,6 +112,8 @@ class GroupController extends Controller {
 	}
 
 	public function GroupMembers (Request $request, string $group_name) {
+		
+		// Name will always be encoded.
 		$group_name = urldecode($group_name);
 
 		$group = UserDAO::GetGroupByName($group_name);

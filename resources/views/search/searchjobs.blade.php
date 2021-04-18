@@ -1,4 +1,4 @@
-@extends('layouts.mainlayout', ['title' => 'Seach Jobs - Polycom'])
+@extends('layouts.mainlayout', ['title' => 'Seach Jobs - Polycom', 'post_button' => true])
 
 @section('content')
 <a href="/search/user?q={{ $query }}">Search Users</a> <a href="/search/group?q={{ $query }}">Search Groups</a><br />

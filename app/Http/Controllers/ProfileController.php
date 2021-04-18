@@ -64,6 +64,8 @@ class ProfileController extends Controller {
 	}
 	
 	public function AddExperience (Request $request) {
+		
+		// Int value for the DateTime epoch.
 		$epoch = 1344988800;
 		
 		$title            = $request->input ('title');
@@ -92,6 +94,8 @@ class ProfileController extends Controller {
 	}
 	
 	public function EditExperience (Request $request, $username, $id) {
+		
+		// Int value for the DateTime epoch.
 		$epoch = 1344988800;
 		
 		$id = intval ($id);

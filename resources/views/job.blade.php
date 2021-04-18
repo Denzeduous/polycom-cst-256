@@ -1,4 +1,4 @@
-@extends('layouts.mainlayout', ['title' => $job->GetTitle() . ' - Polycom'])
+@extends('layouts.mainlayout', ['title' => $job->GetTitle() . ' - Polycom', 'post_button' => true])
 
 @section('content')
 <div style="width: 100%; text-align: center">
